@@ -378,6 +378,30 @@ func handleSettingsSetRequest(w http.ResponseWriter, r *http.Request) {
 					case "WiFiPassphrase":
 						globalSettings.WiFiPassphrase = val.(string)
 						resetWiFi = true
+					case "SpeedUnits":
+						globalSettings.SpeedUnits = val.(string)
+					case "AltitudeUnits":
+						globalSettings.AltitudeUnits = val.(string)	
+					case "DistanceUnits":
+						globalSettings.DistanceUnits = val.(string)	
+					case "ShowWarnings":
+						globalSettings.ShowWarnings = val.(bool)	
+   					case "WarnProximityDistance":
+					    globalSettings.WarnProximityDistance = val.(float64)
+					case "WarnProximityAltitude":
+					    globalSettings.WarnProximityAltitude = val.(float64)
+					case "Vs0":
+					    globalSettings.Vs0 = val.(float64)
+					case "Vs1":
+					    globalSettings.Vs1 = val.(float64)
+					case "Vfe": 
+						globalSettings.Vfe = val.(float64)
+					case "Vno":
+						globalSettings.Vno = val.(float64)
+					case "Vne":
+						globalSettings.Vne = val.(float64)
+					case "BestGlide":
+						globalSettings.BestGlide = val.(float64)
 					default:
 						log.Printf("handleSettingsSetRequest:json: unrecognized key:%s\n", key)
 					}
