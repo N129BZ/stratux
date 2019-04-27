@@ -40,14 +40,28 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 		$scope.WatchList = settings.WatchList;
 		$scope.OwnshipModeS = settings.OwnshipModeS;
 		$scope.DeveloperMode = settings.DeveloperMode;
-        $scope.GLimits = settings.GLimits;
-		$scope.StaticIps = settings.StaticIps;
+		$scope.GLimits = settings.GLimits;
 
+		$scope.StaticIps = settings.StaticIps;
         $scope.WiFiSSID = settings.WiFiSSID;
         $scope.WiFiPassphrase = settings.WiFiPassphrase;
         $scope.WiFiSecurityEnabled = settings.WiFiSecurityEnabled;
         $scope.WiFiChannel = settings.WiFiChannel;
 
+		// HUD settings
+		$scope.SpeedTapeUnit = settings.SpeedTapeUnit;
+		$scope.AltitudeTapeUnit = settings.AltitudeTapeUnit;
+		$scope.ShowWarning = settings.ShowWarning;
+		$scope.WarningDistanceUnit = settings.WarningDistanceUnit;
+		$scope.WarningDistance = settings.WarningDistance;
+		$scope.WarningAltitude = settings.WarningAltitude;
+		$scope.Vs0 = settings.Vs0;
+		$scope.Vs1 = settings.Vs1;
+		$scope.Vfe = settings.Vfe;
+		$scope.Vno = settings.Vno;
+		$scope.Vne = settings.Vne;
+		$scope.BestGlide = settings.BestGlide;
+		
         $scope.Channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 	}
 
@@ -175,7 +189,73 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
         }
     };
 
-    $scope.postShutdown = function () {
+	$scope.updateSpeedTapeUnit = function () {
+		if ($scope.SpeedUnit !== settings["SpeedTapeUnit"]) {
+			settings["SpeedTapeUnit"] = $scope.SpeedTapeUnit;
+			var newsettings = {
+				"SpeedTapeUnit": settings["SpeedTapeUnit"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+	
+	$scope.updateAltitudeUnit = function () {
+		if ($scope.AltitudeUnit !== settings["AltitudeTapeUnit"]) {
+			settings["AltitudeTapeUnit"] = $scope.AltitudeTapeUnit;
+			var newsettings = {
+				"AltitudeTapeUnit": settings["AltitudeTapeUnit"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+	
+	$scope.updateShowWarning = function () {
+		if ($scope.ShowWarning !== settings["ShowWarning"]) {
+			settings["ShowWarning"] = $scope.ShowWarning;
+			var newsettings = { 
+				"ShowWarning": settings["ShowWarning"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+	
+	$scope.updateWarningDistanceUnit = function () {
+		if ($scope.WarningDistanceUnit !== settings["WarningDistanceUnit"]) {
+			settings["WarningDistanceUnit"] = $scope.WarningDistanceUnit;
+			var newsettings = {
+				"WarningDistanceUnit": settings["WarningDistanceUnit"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateWarningDistance = function () {
+		if ($scope.WarningDistance !== settings["WarningDistance"]) {
+			settings["WarningDistance"] = $scope.WarningDistance;
+			var newsettings = {
+				"WarningDistance": settings["WarningDistance"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+	
+	$scope.updateWarningAltitude = function () {
+		if ($scope.WarningAltitude !== settings["WarningAltitude"]) {
+			settings["WarningAltitude"] = $scope.WarningAltitude;
+			var newsettings = {
+				"WarningAltitude": settings["WarningAltitude"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.postShutdown = function () {
         $window.location.href = "/";
         $location.path('/home');
         $http.post(URL_SHUTDOWN).
@@ -409,4 +489,106 @@ angular.module('appControllers')
                 ctrl.$parsers.push(gLimitsValidation);
             }
         };
-    });
+	})
+	.directive('speedTapeUnitInput', function() { // directive for validation of HUD speed tape unit)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function speedTapeUnitValidation(value) {
+                    var valid = /^$|^[MKmk]{1}$/.test(value);
+                    ctrl.$setValidity('speedTapeUnit', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(speedTapeUnitValidation);
+            }
+        };
+	})
+	.directive('altitudeTapeUnitInput', function() { // directive for validation of HUD altitude tape unit)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function altitudeTapeUnitValidation(value) {
+                    var valid = /^$|^[FMfm]{1}$/.test(value);
+                    ctrl.$setValidity('altitudeTapeUnit', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(altitudeTapeUnitValidation);
+            }
+        };
+	})
+	.directive('showWarningInput', function() { // directive for validation of HUD show warning yes or no)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function showWarningValidation(value) {
+                    var valid = /^$|^[YNyn]{1}$/.test(value);
+                    ctrl.$setValidity('showWarning', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(showWarningValidation);
+            }
+        };
+	})
+	.directive('warningDistanceUnitInput', function() { // directive for validation of HUD warning distance unit)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function warningDistanceUnitValidation(value) {
+                    var valid = /^$|^[MKFmkf]{1}$/.test(value);
+                    ctrl.$setValidity('warningDistanceUnit', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(warningDistanceUnitValidation);
+            }
+        };
+	})
+	.directive('warningDistanceInput', function() { // directive for validation of HUD warning distance)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function warningDistanceValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('warningDistance', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(warningDistanceValidation);
+            }
+        };
+	})
+	.directive('warningAltitudeInput', function() { // directive for validation of HUD warning altitude)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function warningAltitudeValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('warningAltitude', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(warningAltitudeValidation);
+            }
+        };
+	});

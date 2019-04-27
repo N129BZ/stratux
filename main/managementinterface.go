@@ -378,18 +378,18 @@ func handleSettingsSetRequest(w http.ResponseWriter, r *http.Request) {
 					case "WiFiPassphrase":
 						globalSettings.WiFiPassphrase = val.(string)
 						resetWiFi = true
-					case "SpeedUnits":
-						globalSettings.SpeedUnits = val.(string)
-					case "AltitudeUnits":
-						globalSettings.AltitudeUnits = val.(string)	
-					case "DistanceUnits":
-						globalSettings.DistanceUnits = val.(string)	
-					case "ShowWarnings":
-						globalSettings.ShowWarnings = val.(bool)	
-   					case "WarnProximityDistance":
-					    globalSettings.WarnProximityDistance = val.(float64)
-					case "WarnProximityAltitude":
-					    globalSettings.WarnProximityAltitude = val.(float64)
+					case "SpeedTapeUnit":
+						globalSettings.SpeedTapeUnit = val.(string)
+					case "AltitudeTapeUnit":
+						globalSettings.AltitudeTapeUnit = val.(string)	
+					case "ShowWarning":
+						globalSettings.ShowWarning = val.(string)	
+					case "WarningDistanceUnit":
+						globalSettings.WarningDistanceUnit = val.(string)	
+   					case "WarningDistance":
+					    globalSettings.WarningDistance = val.(float64)
+					case "WarningAltitude":
+					    globalSettings.WarningAltitude = val.(float64)
 					case "Vs0":
 					    globalSettings.Vs0 = val.(float64)
 					case "Vs1":
