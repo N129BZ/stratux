@@ -40,10 +40,14 @@
                         </form>
                         <!-- Show Warning -->
                         <form name="ShowWarningForm" ng-submit=updateShowWarning() novalidate>
-                            <input class="col-xs-9" type="text" show-warning-input ng-model="ShowWarning"
+                            <!-- <input class="col-xs-9" type="text" show-warning-input ng-model="ShowWarning"
                                     ng-blur="updateShowWarning()" ng-disabled="!IMU_Sensor_Enabled"
                                     ng-class="{grayout: !IMU_Sensor_Enabled}"
-                                    placeholder="Show Proximity Warning (Y or N)"/>
+                                    placeholder="Show Proximity Warning (Y or N)"/> -->
+                            <label class="control-label col-xs-7">Show Proximity Warning</label>
+                            <div class="col-xs-5">
+                                <ui-switch ng-model='ShowWarning' settings-change></ui-switch>
+                            </div>
                         </form>
                         <!-- Warning Distance Unit --> 
                         <form name="WarningDistanceUnitForm" ng-submit=updateWarningDistanceUnit() novalidate>

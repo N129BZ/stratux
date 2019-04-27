@@ -383,7 +383,7 @@ func handleSettingsSetRequest(w http.ResponseWriter, r *http.Request) {
 					case "AltitudeTapeUnit":
 						globalSettings.AltitudeTapeUnit = val.(string)	
 					case "ShowWarning":
-						globalSettings.ShowWarning = val.(string)	
+						globalSettings.ShowWarning = val.(bool)	
 					case "WarningDistanceUnit":
 						globalSettings.WarningDistanceUnit = val.(string)	
    					case "WarningDistance":

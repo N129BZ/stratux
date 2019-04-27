@@ -1125,7 +1125,7 @@ type settings struct {
 	WiFiPassphrase       string
 	SpeedTapeUnit        string
 	AltitudeTapeUnit     string	
-	ShowWarning          string	
+	ShowWarning          bool	
 	WarningDistanceUnit	 string	   
 	WarningDistance      float64
 	WarningAltitude      float64
@@ -1212,7 +1212,7 @@ func defaultSettings() {
 
 	globalSettings.SpeedTapeUnit = "K"
 	globalSettings.AltitudeTapeUnit = "F"
-	globalSettings.ShowWarning = "Y"
+	globalSettings.ShowWarning = true
 	globalSettings.WarningDistanceUnit = "M"
 	globalSettings.WarningDistance = 1
 	globalSettings.WarningAltitude = 600
