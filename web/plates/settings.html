@@ -51,11 +51,11 @@
                         </form>
                         <!-- Warning Distance Unit --> 
                         <form name="WarningDistanceUnitForm" ng-submit=updateWarningDistanceUnit() novalidate>
-                                <input class="col-xs-9" type="text" warning-distance-unit-input ng-model="WarningDistanceUnit"
-                                            ng-blur="updateWarningDistanceUnit()" ng-disabled="!IMU_Sensor_Enabled"
-                                            ng-class="{grayout: !IMU_Sensor_Enabled}"
-                                            placeholder="Warning Distance Unit [F]eet or [M]eters"/>
-                                </form>
+                            <input class="col-xs-9" type="text" warning-distance-unit-input ng-model="WarningDistanceUnit"
+                                        ng-blur="updateWarningDistanceUnit()" ng-disabled="!IMU_Sensor_Enabled"
+                                        ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                        placeholder="Warning Distance Unit [F]eet or [M]eters"/>
+                        </form>
                         <!-- Warning Distance -->
                         <form name="WarningDistanceForm" ng-submit=updateWarningDistance() novalidate>
                             <input class="col-xs-9" type="text" show-warning-input ng-model="WarningDistance"
