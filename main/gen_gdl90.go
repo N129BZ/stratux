@@ -1126,6 +1126,7 @@ type settings struct {
 	SpeedTapeUnit        string
 	AltitudeTapeUnit     string	
 	ShowWarning          bool	
+<<<<<<< HEAD
 	WarningDistanceUnit	 string	   
 	WarningDistance      float64
 	WarningAltitude      float64
@@ -1135,6 +1136,17 @@ type settings struct {
 	Vno                  float64
 	Vne                  float64
 	BestGlide            float64
+=======
+   	WarningDistanceUnit  string
+	WarningDistance      float64
+	WarningAltitude      float64
+	Vs0 	             float64
+	Vs1 		     float64
+	Vfe 		     float64
+	Vno 		     float64
+	Vne 		     float64
+	BestGlide 	     float64
+>>>>>>> 8c7399c396b082c9f0f2e576f275f636a992ea14
 }
 
 type status struct {
