@@ -1216,6 +1216,12 @@ func defaultSettings() {
 	globalSettings.WarningDistanceUnit = "M"
 	globalSettings.WarningDistance = 1
 	globalSettings.WarningAltitude = 600
+	globalSettings.Vs0 = 0;
+	globalSettings.Vs1 = 0;
+	globalSettings.Vfe = 0;
+	globalSettings.Vno = 0;
+	globalSettings.Vne = 0;
+	globalSettings.BestGlide = 0;
 }
 
 func readSettings() {

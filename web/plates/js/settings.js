@@ -200,7 +200,7 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 		}
 	};
 	
-	$scope.updateAltitudeUnit = function () {
+	$scope.updateAltitudeTapeUnit = function () {
 		if ($scope.AltitudeUnit !== settings["AltitudeTapeUnit"]) {
 			settings["AltitudeTapeUnit"] = $scope.AltitudeTapeUnit;
 			var newsettings = {
@@ -249,6 +249,72 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 			settings["WarningAltitude"] = $scope.WarningAltitude;
 			var newsettings = {
 				"WarningAltitude": settings["WarningAltitude"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateVs0 = function () {
+		if ($scope.Vs0 !== settings["Vs0"]) {
+			settings["Vs0"] = $scope.Vs0;
+			var newsettings = {
+				"Vs0": settings["Vs0"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateVs1 = function () {
+		if ($scope.Vs1 !== settings["Vs1"]) {
+			settings["Vs1"] = $scope.Vs1;
+			var newsettings = {
+				"Vs1": settings["Vs1"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateVfe = function () {
+		if ($scope.Vfe !== settings["Vfe"]) {
+			settings["Vfe"] = $scope.Vfe;
+			var newsettings = {
+				"Vfe": settings["Vfe"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateVno = function () {
+		if ($scope.Vno !== settings["Vno"]) {
+			settings["Vno"] = $scope.Vno;
+			var newsettings = {
+				"Vs0": settings["Vs0"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateVne = function () {
+		if ($scope.Vne !== settings["Vne"]) {
+			settings["Vne"] = $scope.Vne;
+			var newsettings = {
+				"Vne": settings["Vne"]
+			};
+			//console.log(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));
+		}
+	};
+
+	$scope.updateBestGlide = function () {
+		if ($scope.BestGlide !== settings["BestGlide"]) {
+			settings["BestGlide"] = $scope.BestGlide;
+			var newsettings = {
+				"BestGlide": settings["BestGlide"]
 			};
 			//console.log(angular.toJson(newsettings));
 			setSettings(angular.toJson(newsettings));
@@ -589,6 +655,108 @@ angular.module('appControllers')
                     }
                 }
                 ctrl.$parsers.push(warningAltitudeValidation);
+            }
+        };
+	})
+	.directive('vs0Input', function() { // directive for validation of HUD Vs0)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function vs0Validation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('Vs0', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(vs0Validation);
+            }
+        };
+	})
+	.directive('vs1Input', function() { // directive for validation of HUD Vs1)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function vs1Validation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('Vs1', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(vs1Validation);
+            }
+        };
+	})
+	.directive('vfeInput', function() { // directive for validation of HUD Vfe)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function vfeValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('Vfe', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(vfeValidation);
+            }
+        };
+	})
+	.directive('vnoInput', function() { // directive for validation of HUD Vno)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function vnoValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('Vno', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(vnoValidation);
+            }
+        };
+	})
+	.directive('vneInput', function() { // directive for validation of HUD Vne)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function vneValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('Vne', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(vneValidation);
+            }
+        };
+	})
+	.directive('bestGlideInput', function() { // directive for validation of HUD BestGlide)
+		return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function warningAltitudeValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('BestGlide', valid);
+                    if (valid) {
+                        return value;
+                    } else {
+                        return "";
+                    }
+                }
+                ctrl.$parsers.push(bestGlideValidation);
             }
         };
 	});
