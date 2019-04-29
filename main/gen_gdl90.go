@@ -1121,18 +1121,18 @@ type settings struct {
 	WiFiChannel          int
 	WiFiSecurityEnabled  bool
 	WiFiPassphrase       string
-	SpeedUnits 			 string
-	AltitudeUnits 		 string	
-	DistanceUnits 		 string	
-	ShowWarnings 		 bool	
-   	WarnProximityDistance float64
-	WarnProximityAltitude float64
-	Vs0 				 float64
-	Vs1 				 float64
-	Vfe 				 float64
-	Vno 				 float64
-	Vne 				 float64
-	BestGlide 			 float64
+	SpeedTapeUnit 	     string
+	AltitudeTapeUnit     string		
+	ShowWarning 	     bool	
+	WarningDistanceUnit  string
+   	WarningDistance      float64
+	WarningAltitude      float64
+	Vs0                  float64
+	Vs1                  float64
+	Vfe                  float64
+	Vno                  float64
+	Vne                  float64
+	BestGlide            float64
 }
 
 type status struct {
