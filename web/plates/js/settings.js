@@ -496,7 +496,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function speedTapeUnitValidation(value) {
                     var valid = /^$|^[MKmk]{1}$/.test(value);
-                    ctrl.$setValidity('speedTapeUnit', valid);
+                    ctrl.$setValidity('SpeedTapeUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -513,7 +513,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function altitudeTapeUnitValidation(value) {
                     var valid = /^$|^[FMfm]{1}$/.test(value);
-                    ctrl.$setValidity('altitudeTapeUnit', valid);
+                    ctrl.$setValidity('AltitudeTapeUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -530,7 +530,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function showWarningValidation(value) {
                     var valid = /^$|^[YNyn]{1}$/.test(value);
-                    ctrl.$setValidity('showWarning', valid);
+                    ctrl.$setValidity('ShowWarning', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -547,7 +547,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function warningDistanceUnitValidation(value) {
                     var valid = /^$|^[MKFmkf]{1}$/.test(value);
-                    ctrl.$setValidity('warningDistanceUnit', valid);
+                    ctrl.$setValidity('WarningDistanceUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -564,7 +564,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function warningDistanceValidation(value) {
                     var valid = /[0-9]$/.test(value);
-                    ctrl.$setValidity('warningDistance', valid);
+                    ctrl.$setValidity('WarningDistance', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -581,7 +581,7 @@ angular.module('appControllers')
             link: function(scope, element, attr, ctrl) {
                 function warningAltitudeValidation(value) {
                     var valid = /[0-9]$/.test(value);
-                    ctrl.$setValidity('warningAltitude', valid);
+                    ctrl.$setValidity('WarningAltitude', valid);
                     if (valid) {
                         return value;
                     } else {
