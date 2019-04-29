@@ -40,9 +40,9 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 		$scope.WatchList = settings.WatchList;
 		$scope.OwnshipModeS = settings.OwnshipModeS;
 		$scope.DeveloperMode = settings.DeveloperMode;
-		$scope.GLimits = settings.GLimits;
-
+        $scope.GLimits = settings.GLimits;
 		$scope.StaticIps = settings.StaticIps;
+
         $scope.WiFiSSID = settings.WiFiSSID;
         $scope.WiFiPassphrase = settings.WiFiPassphrase;
         $scope.WiFiSecurityEnabled = settings.WiFiSecurityEnabled;
@@ -61,7 +61,7 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 		$scope.Vno = settings.Vno;
 		$scope.Vne = settings.Vne;
 		$scope.BestGlide = settings.BestGlide;
-		
+
         $scope.Channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 	}
 
@@ -190,46 +190,48 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
     };
 
 	$scope.updateSpeedTapeUnit = function () {
-		if ($scope.SpeedUnit !== settings["SpeedTapeUnit"]) {
+		if ($scope.SpeedTapeUnit !== settings["SpeedTapeUnit"]) {
 			settings["SpeedTapeUnit"] = $scope.SpeedTapeUnit;
 			var newsettings = {
 				"SpeedTapeUnit": settings["SpeedTapeUnit"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
+<<<<<<< HEAD
 	
 	$scope.updateAltitudeTapeUnit = function () {
 		if ($scope.AltitudeUnit !== settings["AltitudeTapeUnit"]) {
+=======
+
+	$scope.updateAltitudeTapeUnit = function () {
+		if ($scope.AltitudeTapeUnit !== settings["AltitudeTapeUnit"]) {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
 			settings["AltitudeTapeUnit"] = $scope.AltitudeTapeUnit;
 			var newsettings = {
 				"AltitudeTapeUnit": settings["AltitudeTapeUnit"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
-	
+
 	$scope.updateShowWarning = function () {
 		if ($scope.ShowWarning !== settings["ShowWarning"]) {
 			settings["ShowWarning"] = $scope.ShowWarning;
-			var newsettings = { 
+			var newsettings = {
 				"ShowWarning": settings["ShowWarning"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
-	
+
 	$scope.updateWarningDistanceUnit = function () {
 		if ($scope.WarningDistanceUnit !== settings["WarningDistanceUnit"]) {
 			settings["WarningDistanceUnit"] = $scope.WarningDistanceUnit;
 			var newsettings = {
 				"WarningDistanceUnit": settings["WarningDistanceUnit"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
 
@@ -239,19 +241,17 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 			var newsettings = {
 				"WarningDistance": settings["WarningDistance"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
-	
+
 	$scope.updateWarningAltitude = function () {
 		if ($scope.WarningAltitude !== settings["WarningAltitude"]) {
 			settings["WarningAltitude"] = $scope.WarningAltitude;
 			var newsettings = {
 				"WarningAltitude": settings["WarningAltitude"]
 			};
-			//console.log(angular.toJson(newsettings));
-			setSettings(angular.toJson(newsettings));
+			setSettings(angular.toJson(newsettings));	
 		}
 	};
 
@@ -555,14 +555,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(gLimitsValidation);
             }
         };
-	})
-	.directive('speedTapeUnitInput', function() { // directive for validation of HUD speed tape unit)
-		return {
+    })
+    .directive('speedTapeUnitInput', function() { // directive for validation of HUD speed tape unit)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function speedTapeUnitValidation(value) {
                     var valid = /^$|^[MKmk]{1}$/.test(value);
-                    ctrl.$setValidity('SpeedTapeUnit', valid);
+                    ctrl.$setValidity('speedTapeUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -572,14 +572,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(speedTapeUnitValidation);
             }
         };
-	})
-	.directive('altitudeTapeUnitInput', function() { // directive for validation of HUD altitude tape unit)
-		return {
+    })
+    .directive('altitudeTapeUnitInput', function() { // directive for validation of HUD altitude tape unit)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function altitudeTapeUnitValidation(value) {
                     var valid = /^$|^[FMfm]{1}$/.test(value);
-                    ctrl.$setValidity('AltitudeTapeUnit', valid);
+                    ctrl.$setValidity('altitudeTapeUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -589,14 +589,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(altitudeTapeUnitValidation);
             }
         };
-	})
-	.directive('showWarningInput', function() { // directive for validation of HUD show warning yes or no)
-		return {
+    })
+    .directive('showWarningInput', function() { // directive for validation of HUD show warning yes or no)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function showWarningValidation(value) {
                     var valid = /^$|^[YNyn]{1}$/.test(value);
-                    ctrl.$setValidity('ShowWarning', valid);
+                    ctrl.$setValidity('showWarning', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -606,14 +606,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(showWarningValidation);
             }
         };
-	})
-	.directive('warningDistanceUnitInput', function() { // directive for validation of HUD warning distance unit)
-		return {
+    })
+    .directive('warningDistanceUnitInput', function() { // directive for validation of HUD warning distance unit)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function warningDistanceUnitValidation(value) {
                     var valid = /^$|^[MKFmkf]{1}$/.test(value);
-                    ctrl.$setValidity('WarningDistanceUnit', valid);
+                    ctrl.$setValidity('warningDistanceUnit', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -623,14 +623,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(warningDistanceUnitValidation);
             }
         };
-	})
-	.directive('warningDistanceInput', function() { // directive for validation of HUD warning distance)
-		return {
+    })
+    .directive('warningDistanceInput', function() { // directive for validation of HUD warning distance)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function warningDistanceValidation(value) {
                     var valid = /[0-9]$/.test(value);
-                    ctrl.$setValidity('WarningDistance', valid);
+                    ctrl.$setValidity('warningDistance', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -640,14 +640,14 @@ angular.module('appControllers')
                 ctrl.$parsers.push(warningDistanceValidation);
             }
         };
-	})
-	.directive('warningAltitudeInput', function() { // directive for validation of HUD warning altitude)
-		return {
+    })
+    .directive('warningAltitudeInput', function() { // directive for validation of HUD warning altitude)
+	return {
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function warningAltitudeValidation(value) {
                     var valid = /[0-9]$/.test(value);
-                    ctrl.$setValidity('WarningAltitude', valid);
+                    ctrl.$setValidity('warningAltitude', valid);
                     if (valid) {
                         return value;
                     } else {
@@ -657,14 +657,24 @@ angular.module('appControllers')
                 ctrl.$parsers.push(warningAltitudeValidation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('vs0Input', function() { // directive for validation of HUD Vs0)
 		return {
+=======
+    })
+    .directive('vs0Input', function() { // directive for validation of HUD vs0)
+	return {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function vs0Validation(value) {
                     var valid = /[0-9]$/.test(value);
+<<<<<<< HEAD
                     ctrl.$setValidity('Vs0', valid);
+=======
+                    ctrl.$setValidity('vs0', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
@@ -674,14 +684,24 @@ angular.module('appControllers')
                 ctrl.$parsers.push(vs0Validation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('vs1Input', function() { // directive for validation of HUD Vs1)
 		return {
+=======
+    })
+    .directive('vs1Input', function() { // directive for validation of HUD vs1)
+        return {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function vs1Validation(value) {
                     var valid = /[0-9]$/.test(value);
+<<<<<<< HEAD
                     ctrl.$setValidity('Vs1', valid);
+=======
+                    ctrl.$setValidity('vs1', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
@@ -691,14 +711,24 @@ angular.module('appControllers')
                 ctrl.$parsers.push(vs1Validation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('vfeInput', function() { // directive for validation of HUD Vfe)
 		return {
+=======
+    })
+    .directive('vfeInput', function() { // directive for validation of HUD vfe)
+	return {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function vfeValidation(value) {
                     var valid = /[0-9]$/.test(value);
+<<<<<<< HEAD
                     ctrl.$setValidity('Vfe', valid);
+=======
+                    ctrl.$setValidity('vfe', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
@@ -708,31 +738,55 @@ angular.module('appControllers')
                 ctrl.$parsers.push(vfeValidation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('vnoInput', function() { // directive for validation of HUD Vno)
 		return {
+=======
+    })
+    .directive('vnoInput', function() { // directive for validation of HUD vno)
+	return {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function vnoValidation(value) {
                     var valid = /[0-9]$/.test(value);
+<<<<<<< HEAD
                     ctrl.$setValidity('Vno', valid);
+=======
+                    ctrl.$setValidity('vno', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
                         return "";
+<<<<<<< HEAD
                     }
+=======
+					}
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                 }
                 ctrl.$parsers.push(vnoValidation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('vneInput', function() { // directive for validation of HUD Vne)
 		return {
+=======
+    })
+    .directive('vneInput', function() { // directive for validation of HUD vne)
+	return {
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
             require: 'ngModel',
             link: function(scope, element, attr, ctrl) {
                 function vneValidation(value) {
                     var valid = /[0-9]$/.test(value);
+<<<<<<< HEAD
                     ctrl.$setValidity('Vne', valid);
+=======
+                    ctrl.$setValidity('vne', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
@@ -742,6 +796,7 @@ angular.module('appControllers')
                 ctrl.$parsers.push(vneValidation);
             }
         };
+<<<<<<< HEAD
 	})
 	.directive('bestGlideInput', function() { // directive for validation of HUD BestGlide)
 		return {
@@ -750,6 +805,16 @@ angular.module('appControllers')
                 function warningAltitudeValidation(value) {
                     var valid = /[0-9]$/.test(value);
                     ctrl.$setValidity('BestGlide', valid);
+=======
+    })
+    .directive('bestGlideInput', function() { // directive for validation of HUD BestGlide)
+	return {
+            require: 'ngModel',
+            link: function(scope, element, attr, ctrl) {
+                function bestGlideValidation(value) {
+                    var valid = /[0-9]$/.test(value);
+                    ctrl.$setValidity('bestGlide', valid);
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
                     if (valid) {
                         return value;
                     } else {
@@ -758,5 +823,10 @@ angular.module('appControllers')
                 }
                 ctrl.$parsers.push(bestGlideValidation);
             }
+<<<<<<< HEAD
         };
 	});
+=======
+	};
+    });
+>>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
