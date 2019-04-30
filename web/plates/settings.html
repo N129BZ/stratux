@@ -66,14 +66,49 @@
                                     ng-class="{grayout: !IMU_Sensor_Enabled}"
                                     placeholder="Warning Relative Altitude"/>
                         </form>
-                        <!-- ToDo: V-Speeds
-                            Vs0 				 float64
-                            Vs1 				 float64
-                            Vfe 				 float64
-                            Vno 				 float64
-                            Vne 				 float64
-                            BestGlide 			 float64
-                        -->
+                        <!-- Vspeeds -->
+                        <form name="Vs0Form" ng-submit=updateVs0() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vs0"
+                                    ng-blur="updateVs0()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vs0"/>
+                        </form>
+                        <form name="Vs1Form" ng-submit=updateVs1() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vs1"
+                                    ng-blur="updateVs1()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vs1"/>
+                        </form>
+                        <form name="VfeForm" ng-submit=updateVfe() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vfe"
+                                    ng-blur="updateVfe()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vfe"/>
+                        </form>
+                        <form name="VnoForm" ng-submit=updateVno() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vno"
+                                    ng-blur="updateVno()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vno"/>
+                        </form>
+                        <form name="VneForm" ng-submit=updateVne() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vne"
+                                    ng-blur="updateVne()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vne"/>
+                        </form>
+                        <form name="Vs0Form" ng-submit=updateVs0() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="Vs0"
+                                    ng-blur="updateVs0()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Vs0"/>
+                        </form>
+                        <form name="BestGlideForm" ng-submit=updateBestGlide() novalidate>
+                            <input class="col-xs-9" type="number" show-warning-input ng-model="BestGlide"
+                                    ng-blur="updateBestGlide()" ng-disabled="!IMU_Sensor_Enabled"
+                                    ng-class="{grayout: !IMU_Sensor_Enabled}"
+                                    placeholder="Best Glide Speed"/>
+                        </form>
                     </div>
                 </div>
             </div>
