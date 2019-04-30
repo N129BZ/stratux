@@ -198,15 +198,9 @@ function SettingsCtrl($rootScope, $scope, $state, $location, $window, $http) {
 			setSettings(angular.toJson(newsettings));	
 		}
 	};
-<<<<<<< HEAD
-	
-	$scope.updateAltitudeTapeUnit = function () {
-		if ($scope.AltitudeUnit !== settings["AltitudeTapeUnit"]) {
-=======
 
 	$scope.updateAltitudeTapeUnit = function () {
 		if ($scope.AltitudeTapeUnit !== settings["AltitudeTapeUnit"]) {
->>>>>>> 145620da3754474b2867afd61b8af523e2b3f068
 			settings["AltitudeTapeUnit"] = $scope.AltitudeTapeUnit;
 			var newsettings = {
 				"AltitudeTapeUnit": settings["AltitudeTapeUnit"]
