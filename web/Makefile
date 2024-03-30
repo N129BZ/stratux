@@ -17,6 +17,7 @@ all:
 	cp -r maui $(www)/
 	cp -r plates $(www)/
 	cp index.html $(www)/
+	cp wtbal.html $(www)/
 	cp alert.wav $(www)/
 	cp stratux.appcache $(www)/
 	# Mark the manifest with the git hash.
