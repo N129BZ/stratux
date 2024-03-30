@@ -834,10 +834,6 @@ func handleUpdatePostRequest(w http.ResponseWriter, r *http.Request) {
 	go delayReboot()
 }
 
-func handleWeightBalRequest(w http.ResponseWriter, r *http.Request) {
-	
-}
-
 func setNoCache(w http.ResponseWriter) {
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
@@ -1130,6 +1126,10 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleWeightBalance(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func managementInterface() {
 	weatherUpdate = NewUIBroadcaster()
 	trafficUpdate = NewUIBroadcaster()
@@ -1188,6 +1188,7 @@ func managementInterface() {
 			s.ServeHTTP(w, req)
 		})
 
+	http.HandleFunc("/weightbalance", handleWeightBalance)
 	http.HandleFunc("/getStatus", handleStatusRequest)
 	http.HandleFunc("/getSituation", handleSituationRequest)
 	http.HandleFunc("/getTowers", handleTowersRequest)
