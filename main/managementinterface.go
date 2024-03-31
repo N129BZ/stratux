@@ -290,6 +290,13 @@ func handleTowersRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 // AJAX call - /getSatellites. Responds with all GNSS satellites that are being tracked, along with status information.
+func handleWtBalRequest(w http.ResponseWriter, r *http.Request) {
+	setNoCache(w)
+	setJSONHeaders(w)
+
+}
+
+// AJAX call - /getSatellites. Responds with all GNSS satellites that are being tracked, along with status information.
 func handleSatellitesRequest(w http.ResponseWriter, r *http.Request) {
 	setNoCache(w)
 	setJSONHeaders(w)
@@ -1126,9 +1133,6 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleWeightBalance(w http.ResponseWriter, r *http.Request) {
-
-}
 
 func managementInterface() {
 	weatherUpdate = NewUIBroadcaster()
@@ -1179,8 +1183,6 @@ func managementInterface() {
 				Handler: websocket.Handler(handleRadarWS)}
 			s.ServeHTTP(w, req)
 		})
-
-
 	http.HandleFunc("/jsonio",
 		func(w http.ResponseWriter, req *http.Request) {
 			s := websocket.Server{
@@ -1188,7 +1190,7 @@ func managementInterface() {
 			s.ServeHTTP(w, req)
 		})
 
-	http.HandleFunc("/weightbalance", handleWeightBalance)
+	http.HandleFunc("/weightbalance",  handleWtBalRequest)
 	http.HandleFunc("/getStatus", handleStatusRequest)
 	http.HandleFunc("/getSituation", handleSituationRequest)
 	http.HandleFunc("/getTowers", handleTowersRequest)
