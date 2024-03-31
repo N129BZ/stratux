@@ -10,13 +10,13 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="370" height="360" id="wbcontainer">
       <path d="M.229 142.024 129.469.649l240.506.636-.003 359.073-369.89.144Z" style="fill:#e6e6e6" id="wbpath"/>
     </svg>
-      <label class="nglimit" id="nglimit">Nose gear structural limit</label>
-      <label class="w720" id="w720">720 --</label>
-      <label class="w1080" id="w1080">1080 --</label>
-      <label class="wMaxGross" id="wMaxGross">1440 -----------------------------------------</label>
-      <label class="a270" id="a270">270-</label>
-      <label class="a455" id="a455">455-</label>
-      <div id="dot"></div>
+    <label class="nglimit" id="nglimit">Nose gear structural limit</label>
+    <label class="w720" id="w720">720 --</label>
+    <label class="w1080" id="w1080">1080 --</label>
+    <label class="wMaxGross" id="wMaxGross">1440 -----------------------------------------</label>
+    <label class="a270" id="a270">270-</label>
+    <label class="a455" id="a455">455-</label>
+    <div id="dot"></div>
       <label class="myplane" id="myplane">(x|y)</label>
       <label class="ylegend">Weight (in lbs)</label>
       <label class="xlegend">Acceptable CG Range (in mm)</label>
@@ -71,7 +71,8 @@
       <label for="cog" class="weightLabel">CG Coordinates:</label>
       <input type="text" class="coords" id="cog" value="(0|0)" readonly="true">
     </div>
-    <div><button id="savebutton" disabled onclick="saveConfig()" >Save</button></div>
-    <!-- <script type="text/javascript" src="js/wtbal.js"></script> -->
+    <div>
+      <button id="savebutton" disabled onclick="saveConfig()" >Save</button>
+    </div>
   </div>
 </div>
