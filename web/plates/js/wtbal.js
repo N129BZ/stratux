@@ -57,5 +57,34 @@ var momentMap = new Map();
 
 
 function WtBalCtrl($rootScope, $scope, $state, $http, $interval, craftService) {
+    $scope.$parent.helppage = 'plates/radar-help.html';
+	$scope.data_list = [];
+	$scope.data_list_invalid = [];
+    
+    $state.get('wtbal').onEnter = function () {
+        // everything gets handled correctly by the controller
+    };
 
+    $state.get('wtbal').onExit = function () {
+        
+    };
+}
+
+function requestFullScreen(el) {
+	// Supports most browsers and their versions.
+	var requestMethod = el.requestFullscreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+	if (requestMethod) requestMethod.call(el);
+}
+
+
+function cancelFullScreen(el) {
+	var requestMethod = el.cancelFullScreen || el.webkitCancelFullScreen || el.mozCancelFullScreen || el.exitFullscreen;
+	if (requestMethod) {  // cancel full screen.
+		requestMethod.call(el);
+	} else if (typeof window.ActiveXObject !== 'undefined') {  // Older IE.
+		var wscript = new ActiveXObject('WScript.Shell');
+		if (wscript !== null) {
+			wscript.SendKeys('{F11}');
+		}
+	}
 }

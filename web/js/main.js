@@ -99,7 +99,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 			controller: 'MapCtrl',
 			reloadOnSearch: false
 		})
-		.state('weightbalance', {
+		.state('wtbal', {
 			url: '/weightbalance',
 			templateUrl: 'plates/wtbal.html',
 			controller: 'WtBalCtrl',
