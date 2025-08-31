@@ -1163,10 +1163,13 @@ func connectAirportsArchive(path string) (*sql.DB, map[string]Airport, error) {
 	}
 
 	cacheEntry := NewAirportConnectionCacheEntry(path, conn)
-
-	if cacheEntry != nil {
-		mbAirportCache[path] = *cacheEntry
+	if cacheEntry == nil {
+		if conn != nil {
+			conn.Close()
+		}
+		return nil, nil, fmt.Errorf("failed to create airport cache entry for %s", path)
 	}
+	mbAirportCache[path] = *cacheEntry
 	return conn, cacheEntry.Airport, nil
 }
 
@@ -1311,7 +1314,7 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 // Begin stratuxmap route handlers 
 func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 	fname := "airports.db"
-	db, _, err := connectAirportsArchive(STRATUX_HOME + "/" + fname)
+	db, _, err := connectAirportsArchive(STRATUX_HOME + "/stratuxmap/" + fname)
 	if err != nil {
 		log.Printf("SQLite open " + fname + " failed: %s", err.Error())
 		http.Error(w, err.Error(), 500)
@@ -1324,33 +1327,42 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	id := parts[2]
 	
-    sqlStmt := `
-        SELECT
-            ident, name, type, longitude_deg AS lon, latitude_deg AS lat, elevation_ft AS elevation,
-            (SELECT json_group_array(json_object('frequency', frequency_mhz, 'description', description)) 
-			 FROM frequencies 
-			 WHERE frequencies.airport_ident = airports.ident) AS frequencies,
-            (SELECT json_group_array(json_object('length', length_ft, 'width', width_ft, 'surface', surface, 'le_ident', le_ident, 'he_ident', he_ident)) 
-			 FROM runways 
-			 WHERE runways.airport_ident = airports.ident) AS runways 
-        FROM airports
-        WHERE ident = ?;
-    `
-    var result Airport
-    var freqJSON, runwaysJSON sql.NullString
-	
-	err = db.QueryRow(sqlStmt, id).Scan(&result.Ident,&result.Name,&result.Type,&result.Lon,&result.Lat,&result.Elevation,&freqJSON,&runwaysJSON)
-    
+	// Query airport basic info
+	sqlStmt := `
+		SELECT ident, name, type, longitude_deg AS lon, latitude_deg AS lat, elevation_ft AS elevation
+		FROM airports
+		WHERE ident = ?;`
+	var result Airport
+	err = db.QueryRow(sqlStmt, id).Scan(&result.Ident, &result.Name, &result.Type, &result.Lon, &result.Lat, &result.Elevation)
 	if err != nil {
-    	http.Error(w, err.Error(), 500)
-    	return
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
-    if freqJSON.Valid {
-		json.Unmarshal([]byte(freqJSON.String), &result.Frequencies)
+	// Query frequencies
+	freqRows, err := db.Query(`SELECT frequency_mhz, description FROM frequencies WHERE airport_ident = ?;`, id)
+	if err == nil {
+		defer freqRows.Close()
+		for freqRows.Next() {
+			var f Frequency
+			err := freqRows.Scan(&f.Frequency, &f.Description)
+			if err == nil {
+				result.Frequencies = append(result.Frequencies, f)
+			}
+		}
 	}
-	if runwaysJSON.Valid {
-		json.Unmarshal([]byte(runwaysJSON.String), &result.Runways)
+
+	// Query runways
+	runwayRows, err := db.Query(`SELECT length_ft, width_ft, surface, le_ident, he_ident FROM runways WHERE airport_ident = ?;`, id)
+	if err == nil {
+		defer runwayRows.Close()
+		for runwayRows.Next() {
+			var r Runway
+			err := runwayRows.Scan(&r.Length, &r.Width, &r.Surface, &r.LeIdent, &r.HeIdent)
+			if err == nil {
+				result.Runways = append(result.Runways, r)
+			}
+		}
 	}
 
 	resJson, _ := json.Marshal(result)
@@ -1457,7 +1469,7 @@ func managementInterface() {
 	http.HandleFunc("/tiles/", handleTile)
 
 	// begin stratuxmap routes
-    http.HandleFunc("/airport/:id", handleAirportRequest)
+    http.HandleFunc("/airport/", handleAirportRequest)
 	http.HandleFunc("/metadatasets", handleMetaDatasetsRequest)
 	http.HandleFunc("/gethistory", handleGetHistoryRequest)
 	http.HandleFunc("/savehistory", handleSaveHistoryRequest)
