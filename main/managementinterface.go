@@ -104,6 +104,14 @@ func NewAirportConnectionCacheEntry(path string, conn *sql.DB) *MbAirportConnect
 	}
 	return &MbAirportConnectionCacheEntry{path, conn, nil, file.ModTime()}
 }
+func (this *MbAirportConnectionCacheEntry) IsOutdated() bool {
+	file, err := os.Stat(this.Path)
+	if err != nil {
+		return true
+	}
+	modTime := file.ModTime()
+	return modTime != this.fileTime
+}
 //  End of stratuxmap Airport types
 
 func (this *MbTileConnectionCacheEntry) IsOutdated() bool {
@@ -1153,12 +1161,13 @@ func connectAirportsArchive(path string) (*sql.DB, map[string]Airport, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	cacheEntry := NewMbTileConnectionCacheEntry(path, conn)
-	cacheEntry.Metadata = readMbTilesMetadata(path, conn)
+
+	cacheEntry := NewAirportConnectionCacheEntry(path, conn)
+
 	if cacheEntry != nil {
-		mbtileConnectionCache[path] = *cacheEntry
+		mbAirportCache[path] = *cacheEntry
 	}
-	return conn, cacheEntry.Metadata, nil
+	return conn, cacheEntry.Airport, nil
 }
 
 func tileToDegree(z, x, y int) (lon, lat float64) {
@@ -1299,12 +1308,10 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/***********************************
- * Begin stratuxmap route handlers *
- ***********************************/
+// Begin stratuxmap route handlers 
 func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 	fname := "airports.db"
-	db, airport, err := connectAirportsArchive(STRATUX_HOME + "/" + fname)
+	db, _, err := connectAirportsArchive(STRATUX_HOME + "/" + fname)
 	if err != nil {
 		log.Printf("SQLite open " + fname + " failed: %s", err.Error())
 		http.Error(w, err.Error(), 500)
@@ -1331,18 +1338,10 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
     `
     var result Airport
     var freqJSON, runwaysJSON sql.NullString
-	err := db.QueryRow(sqlStmt, id).Scan(
-        &result.Ident,
-        &result.Name,
-        &result.Type,
-        &result.Lon,
-        &result.Lat,
-        &result.Elevation,
-        &freqJSON,
-        &runwaysJSON
-	)
-
-    if err != nil {
+	
+	err = db.QueryRow(sqlStmt, id).Scan(&result.Ident,&result.Name,&result.Type,&result.Lon,&result.Lat,&result.Elevation,&freqJSON,&runwaysJSON)
+    
+	if err != nil {
     	http.Error(w, err.Error(), 500)
     	return
 	}
@@ -1369,9 +1368,7 @@ func handleGetHistoryRequest(w http.ResponseWriter, r *http.Request) {
 func handleSaveHistoryRequest(w http.ResponseWriter, r *http.Request) {
 	// Handle save history request
 }
-/************************************
- * End of stratuxmap route handlers *
- ************************************/
+// End of stratuxmap route handlers 
 
 func managementInterface() {
 	weatherUpdate = NewUIBroadcaster()
@@ -1459,23 +1456,12 @@ func managementInterface() {
 	http.HandleFunc("/tiles/tilesets", handleTilesets)
 	http.HandleFunc("/tiles/", handleTile)
 
+	// begin stratuxmap routes
     http.HandleFunc("/airport/:id", handleAirportRequest)
 	http.HandleFunc("/metadatasets", handleMetaDatasetsRequest)
 	http.HandleFunc("/gethistory", handleGetHistoryRequest)
-	http.HandleFunc("/savehistory", handleSaveHistoryRequest);
-
-    /*
-		
-    app.get("/gethistory", (req,res) => {
-        getPositionHistory(res);
-    });
-
-    app.post("/savehistory", (req, res) => {
-        savePositionHistory(req.body);
-        res.writeHead(200);
-        res.end();
-    });
-	*/
+	http.HandleFunc("/savehistory", handleSaveHistoryRequest)
+	// end stratuxmap routes
 
 	addr := fmt.Sprintf(":%d", 8500)
     log.Printf("web configuration console on port 8500", addr);
