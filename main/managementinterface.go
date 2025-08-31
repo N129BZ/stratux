@@ -53,58 +53,8 @@ type MbTileConnectionCacheEntry struct {
 	Conn *sql.DB
 	Metadata map[string]string
 	fileTime time.Time
+	
 }
-
-// Begin stratuxmap type definitions
-
-// Frequency represents a frequency list for an Airport
-type Frequency struct {
-    Frequency   float64 `json:"frequency"`
-    Description string  `json:"description"`
-}
-
-// Runway data...
-type Runway struct {
-    Length   int    `json:"length"`
-    Width    int    `json:"width"`
-    Surface  string `json:"surface"`
-    LeIdent  string `json:"le_ident"`
-    HeIdent  string `json:"he_ident"`
-}
-
-// Airport data...
-type Airport struct {
-    Ident         string      `json:"ident"`
-    Name          string      `json:"name"`
-    Type          string      `json:"type"`
-    Lon           float64     `json:"lon"`
-    Lat           float64     `json:"lat"`
-    Elevation     int         `json:"elevation"`
-    Frequencies   []Frequency `json:"frequencies"`
-    Runways       []Runway    `json:"runways"`
-}
-
-// stratuxmap Airport cache entry
-type MbAirportConnectionCacheEntry struct {
-	Path string
-	Conn *sql.DB
-	Airport map[string]Airport
-	fileTime time.Time
-}
-
-// create a mutex for the airport cache
-var mbAirportCacheLock = sync.Mutex{}
-
-// stratuxmap Airport connection cache
-var mbAirportCache = make(map[string]MbAirportConnectionCacheEntry)
-func NewAirportConnectionCacheEntry(path string, conn *sql.DB) *MbAirportConnectionCacheEntry {
-	file, err := os.Stat(path)
-	if err != nil {
-		return nil
-	}
-	return &MbAirportConnectionCacheEntry{path, conn, nil, file.ModTime()}
-}
-//  End of stratuxmap Airport types
 
 func (this *MbTileConnectionCacheEntry) IsOutdated() bool {
 	file, err := os.Stat(this.Path)
@@ -1141,26 +1091,6 @@ func connectMbTilesArchive(path string) (*sql.DB, map[string]string, error) {
 	return conn, cacheEntry.Metadata, nil
 }
 
-func connectAirportsArchive(path string) (*sql.DB, map[string]Airport, error) {
-	mbAirportCacheLock.Lock()
-	defer mbAirportCacheLock.Unlock()
-
-	if conn, ok := mbAirportCache[path]; ok {
-		return conn.Conn, conn.Airport, nil
-	}
-
-	conn, err := sql.Open("sqlite3", "file:" + path + "?mode=ro")
-	if err != nil {
-		return nil, nil, err
-	}
-	cacheEntry := NewMbTileConnectionCacheEntry(path, conn)
-	cacheEntry.Metadata = readMbTilesMetadata(path, conn)
-	if cacheEntry != nil {
-		mbtileConnectionCache[path] = *cacheEntry
-	}
-	return conn, cacheEntry.Metadata, nil
-}
-
 func tileToDegree(z, x, y int) (lon, lat float64) {
 	// osm-like schema:
 	y = (1 << z) - y - 1
@@ -1299,76 +1229,6 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/***********************************
- * Begin stratuxmap route handlers *
- ***********************************/
-func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
-	fname := "airports.db"
-	db, airport, err := connectAirportsArchive(STRATUX_HOME + "/" + fname)
-	if err != nil {
-		log.Printf("SQLite open " + fname + " failed: %s", err.Error())
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	parts := strings.Split(r.RequestURI, "/")
-	if len(parts) < 2 {
-		http.Error(w, "Invalid request", 400)
-		return
-	}
-	id := parts[2]
-	
-    sqlStmt := `
-        SELECT
-            ident, name, type, longitude_deg AS lon, latitude_deg AS lat, elevation_ft AS elevation,
-            (SELECT json_group_array(json_object('frequency', frequency_mhz, 'description', description)) FROM frequencies WHERE frequencies.airport_ident = airports.ident) AS frequencies,
-            (SELECT json_group_array(json_object('length', length_ft, 'width', width_ft, 'surface', surface, 'le_ident', le_ident, 'he_ident', he_ident)) FROM runways WHERE runways.airport_ident = airports.ident) AS runways 
-        FROM airports
-        WHERE ident = ?;
-    `
-    var result Airport
-    var freqJSON, runwaysJSON sql.NullString
-	err := db.QueryRow(sqlStmt, id).Scan(
-        &result.Ident,
-        &result.Name,
-        &result.Type,
-        &result.Lon,
-        &result.Lat,
-        &result.Elevation,
-        &freqJSON,
-        &runwaysJSON
-	)
-
-    if err != nil {
-    	http.Error(w, err.Error(), 500)
-    	return
-	}
-
-    if freqJSON.Valid {
-		json.Unmarshal([]byte(freqJSON.String), &result.Frequencies)
-	}
-	if runwaysJSON.Valid {
-		json.Unmarshal([]byte(runwaysJSON.String), &result.Runways)
-	}
-
-	resJson, _ := json.Marshal(result)
-	w.Write(resJson)
-}
-
-func handleMetaDatasetsRequest(w http.ResponseWriter, r *http.Request) {
-	// Handle metadata datasets request
-}
-
-func handleGetHistoryRequest(w http.ResponseWriter, r *http.Request) {
-	// Handle get history request
-}
-
-func handleSaveHistoryRequest(w http.ResponseWriter, r *http.Request) {
-	// Handle save history request
-}
-/************************************
- * End of stratuxmap route handlers *
- ************************************/
-
 func managementInterface() {
 	weatherUpdate = NewUIBroadcaster()
 	trafficUpdate = NewUIBroadcaster()
@@ -1455,27 +1315,10 @@ func managementInterface() {
 	http.HandleFunc("/tiles/tilesets", handleTilesets)
 	http.HandleFunc("/tiles/", handleTile)
 
-    http.HandleFunc("/airport/:id", handleAirportRequest)
-	http.HandleFunc("/metadatasets", handleMetaDatasetsRequest)
-	http.HandleFunc("/gethistory", handleGetHistoryRequest)
-	http.HandleFunc("/savehistory", handleSaveHistoryRequest);
 
-    /*
-		
-    app.get("/gethistory", (req,res) => {
-        getPositionHistory(res);
-    });
-
-    app.post("/savehistory", (req, res) => {
-        savePositionHistory(req.body);
-        res.writeHead(200);
-        res.end();
-    });
-	*/
-
-	addr := fmt.Sprintf(":%d", 8500)
-    log.Printf("web configuration console on port 8500", addr);
+	addr := fmt.Sprintf(":%d", ManagementAddr)
+  log.Printf("web configuration console on port %s", addr);
 	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Printf("managementInterface ListenAndServe: 8500\n", err.Error())
+		log.Printf("managementInterface ListenAndServe: %s\n", err.Error())
 	}
 }
