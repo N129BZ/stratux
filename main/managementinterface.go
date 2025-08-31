@@ -1311,7 +1311,7 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	parts := strings.Split(r.RequestURI, "/")
-	if len(parts) < 2 {
+	if len(parts) < 3 {
 		http.Error(w, "Invalid request", 400)
 		return
 	}
@@ -1320,8 +1320,12 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
     sqlStmt := `
         SELECT
             ident, name, type, longitude_deg AS lon, latitude_deg AS lat, elevation_ft AS elevation,
-            (SELECT json_group_array(json_object('frequency', frequency_mhz, 'description', description)) FROM frequencies WHERE frequencies.airport_ident = airports.ident) AS frequencies,
-            (SELECT json_group_array(json_object('length', length_ft, 'width', width_ft, 'surface', surface, 'le_ident', le_ident, 'he_ident', he_ident)) FROM runways WHERE runways.airport_ident = airports.ident) AS runways 
+            (SELECT json_group_array(json_object('frequency', frequency_mhz, 'description', description)) 
+			 FROM frequencies 
+			 WHERE frequencies.airport_ident = airports.ident) AS frequencies,
+            (SELECT json_group_array(json_object('length', length_ft, 'width', width_ft, 'surface', surface, 'le_ident', le_ident, 'he_ident', he_ident)) 
+			 FROM runways 
+			 WHERE runways.airport_ident = airports.ident) AS runways 
         FROM airports
         WHERE ident = ?;
     `
