@@ -53,7 +53,31 @@ type MbTileConnectionCacheEntry struct {
 	Conn *sql.DB
 	Metadata map[string]string
 	fileTime time.Time
-	
+}
+
+type Frequency struct {
+    Frequency   float64 `json:"frequency"`
+    Description string  `json:"description"`
+}
+
+type Runway struct {
+    Length   int    `json:"length"`
+    Width    int    `json:"width"`
+    Surface  string `json:"surface"`
+    LeIdent  string `json:"le_ident"`
+    HeIdent  string `json:"he_ident"`
+}
+
+type Airport struct {
+    Ident         string      `json:"ident"`
+    Name          string      `json:"name"`
+    Type          string      `json:"type"`
+    Lon           float64     `json:"lon"`
+    Lat           float64     `json:"lat"`
+    Elevation     int         `json:"elevation"`
+    Frequencies   []Frequency `json:"frequencies"`
+    Runways       []Runway    `json:"runways"`
+    WikipediaLink string      `json:"wikipedia_link"`
 }
 
 func (this *MbTileConnectionCacheEntry) IsOutdated() bool {
@@ -271,6 +295,64 @@ func handleSituationRequest(w http.ResponseWriter, r *http.Request) {
 	setJSONHeaders(w)
 	situationJSON, _ := json.Marshal(&mySituation)
 	fmt.Fprintf(w, "%s\n", situationJSON)
+}
+
+func handleAirportRequest(id string) (Airport, error) {
+    // Get airport main info
+    sqlStmt := `
+        SELECT
+            ident,
+            name,
+            type,
+            longitude_deg AS lon,
+            latitude_deg AS lat,
+            elevation_ft AS elevation,
+            wikipedia_link
+        FROM airports
+        WHERE ident = ?;
+    `
+    var a Airport
+    db, err := sql.Open("sqlite3", "web/data/airports.db")
+    if err != nil {
+        return Airport{}, nil
+    }
+    defer db.Close()
+    err = db.QueryRow(sqlStmt, id).Scan(
+        &a.Ident, &a.Name, &a.Type, &a.Lon, &a.Lat, &a.Elevation, &a.WikipediaLink,
+    )
+    if err == sql.ErrNoRows {
+        // Return empty Airport object, no error
+        return Airport{}, nil
+    } else if err != nil {
+        return Airport{}, nil
+    }
+
+	// Get frequencies
+    freqRows, err := db.Query("SELECT frequency_mhz, description FROM frequencies WHERE airport_ident = ?", id)
+    if err == nil {
+        defer freqRows.Close()
+        for freqRows.Next() {
+            var f Frequency
+            err := freqRows.Scan(&f.Frequency, &f.Description)
+            if err == nil {
+                a.Frequencies = append(a.Frequencies, f)
+            }
+        }
+    }
+
+    // Get runways
+    runwayRows, err := db.Query("SELECT length_ft, width_ft, surface, le_ident, he_ident FROM runways WHERE airport_ident = ?", id)
+    if err == nil {
+        defer runwayRows.Close()
+        for runwayRows.Next() {
+            var r Runway
+            err := runwayRows.Scan(&r.Length, &r.Width, &r.Surface, &r.LeIdent, &r.HeIdent)
+            if err == nil {
+                a.Runways = append(a.Runways, r)
+            }
+        }
+	}
+	return a, nil
 }
 
 // AJAX call - /getTowers. Responds with all ADS-B ground towers that have sent messages that we were able to parse, along with its stats.
@@ -1286,6 +1368,14 @@ func managementInterface() {
 				Handler: websocket.Handler(handleJsonIo)}
 			s.ServeHTTP(w, req)
 		})
+	
+	http.HandleFunc("/airport", func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+		airport, _ := handleAirportRequest(id) 
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(airport)
+	})
 
 	http.HandleFunc("/getStatus", handleStatusRequest)
 	http.HandleFunc("/getSituation", handleSituationRequest)
@@ -1315,9 +1405,8 @@ func managementInterface() {
 	http.HandleFunc("/tiles/tilesets", handleTilesets)
 	http.HandleFunc("/tiles/", handleTile)
 
-
 	addr := fmt.Sprintf(":%d", ManagementAddr)
-  log.Printf("web configuration console on port %s", addr);
+    log.Printf("web configuration console on port %s", addr);
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Printf("managementInterface ListenAndServe: %s\n", err.Error())
 	}
