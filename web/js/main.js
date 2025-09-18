@@ -98,9 +98,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 		})
 		.state('map', {
 			url: '/map',
-			templateUrl: 'plates/map.html',
-			controller: 'MapCtrl',
-			reloadOnSearch: false
+			reloadOnSearch: false,
 		})
         .state('developer', {
 			url: '/developer',
@@ -111,6 +109,16 @@ app.config(function ($stateProvider, $urlRouterProvider) {
 	$urlRouterProvider.otherwise('/');
 });
 
+
+// Redirect to standalone map.html when 'map' state is requested
+app.run(function($rootScope, $state) {
+	$rootScope.$on('$stateChangeStart', function(event, toState) {
+		if (toState.name === 'map') {
+			event.preventDefault();
+			window.location.href = '/map.html';
+		}
+	});
+});
 
 app.run(function ($transform) {
 	window.$transform = $transform;
