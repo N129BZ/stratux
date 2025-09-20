@@ -1476,7 +1476,7 @@ func handleSaveHistoryPost(w http.ResponseWriter, r *http.Request) {
 	altitude, _ := req["altitude"].(float64)
 	nowZulu := time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
-	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/mapstate.db", false)
+	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/positionhistory.db", false)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error":"db open failed"}`))
