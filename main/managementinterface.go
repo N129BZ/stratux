@@ -1318,80 +1318,81 @@ func handleTile(w http.ResponseWriter, r *http.Request) {
 }
 
 // Begin stratuxmap route handlers 
-func handleAirportRequest(id string) (Airport, error) {
-    id = strings.TrimSpace(id)
+func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	id = strings.TrimSpace(id)
 
-    var airport Airport
-    db, err := connectMapArchive(STRATUX_WWW_DIR + "data/airports.db", true)
-    if err != nil {
-        return Airport{}, err
-    }
-
-    // Query airport main info
-    row := db.QueryRow(`
-        SELECT ident, name, type, longitude_deg, latitude_deg, elevation_ft
-        FROM airports WHERE ident = ?;
-    `, id)
-    var lon, lat float64
-    var elevation int
-    err = row.Scan(&airport.Ident, &airport.Name, &airport.Type, &lon, &lat, &elevation)
-    if err == sql.ErrNoRows {
-        return Airport{}, fmt.Errorf("not found")
-    } else if err != nil {
-        return Airport{}, err
-    }
-    airport.Lon = lon
-    airport.Lat = lat
-    airport.Elevation = elevation
-
-    // Query frequencies
-    freqRows, err := db.Query(`
-        SELECT frequency_mhz, description FROM frequencies WHERE airport_ident = ?;
-    `, id)
-    if err != nil {
-        return Airport{}, err
-    }
-	defer freqRows.Close()
-	var frequencies []Frequency
-	for freqRows.Next() {
-		var f Frequency
-		err := freqRows.Scan(&f.Frequency, &f.Description)
-		if err != nil {
-			// If a row fails, skip it but do not abort the whole airport
-			continue
-		}
-		frequencies = append(frequencies, f)
+	var airport Airport
+	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/airports.db", true)
+	if err != nil {
+		http.Error(w, "Database open failed", http.StatusInternalServerError)
+		return
 	}
-	airport.Frequencies = frequencies
+	defer db.Close()
+
+	// Query airport main info
+	row := db.QueryRow(`SELECT ident, name, type, longitude_deg, latitude_deg, elevation_ft FROM airports WHERE ident = ?;`, id)
+	var lon, lat float64
+	var elevation int
+	err = row.Scan(&airport.Ident, &airport.Name, &airport.Type, &lon, &lat, &elevation)
+	if err == sql.ErrNoRows {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(Airport{})
+		return
+	} else if err != nil {
+		http.Error(w, "Airport query failed", http.StatusInternalServerError)
+		return
+	}
+	airport.Lon = lon
+	airport.Lat = lat
+	airport.Elevation = elevation
+
+	// Query frequencies
+	freqRows, err := db.Query(`SELECT frequency_mhz, description FROM frequencies WHERE airport_ident = ?;`, id)
+	if err != nil {
+		airport.Frequencies = []Frequency{}
+	} else {
+		defer freqRows.Close()
+		var frequencies []Frequency
+		for freqRows.Next() {
+			var f Frequency
+			err := freqRows.Scan(&f.Frequency, &f.Description)
+			if err != nil {
+				continue
+			}
+			frequencies = append(frequencies, f)
+		}
+		airport.Frequencies = frequencies
+	}
 	if airport.Frequencies == nil {
 		airport.Frequencies = []Frequency{}
 	}
 
 	// Query runways
-	rwRows, err := db.Query(`
-		SELECT length_ft, width_ft, surface, le_ident, he_ident FROM runways WHERE airport_ident = ?;
-	`, id)
+	rwRows, err := db.Query(`SELECT length_ft, width_ft, surface, le_ident, he_ident FROM runways WHERE airport_ident = ?;`, id)
 	if err != nil {
 		airport.Runways = []Runway{}
-		return airport, nil
-	}
-	defer rwRows.Close()
-	var runways []Runway
-	for rwRows.Next() {
-		var r Runway
-		err := rwRows.Scan(&r.Length, &r.Width, &r.Surface, &r.LeIdent, &r.HeIdent)
-		if err != nil {
-			// If a row fails, skip it but do not abort the whole airport
-			continue
+	} else {
+		defer rwRows.Close()
+		var runways []Runway
+		for rwRows.Next() {
+			var r Runway
+			err := rwRows.Scan(&r.Length, &r.Width, &r.Surface, &r.LeIdent, &r.HeIdent)
+			if err != nil {
+				continue
+			}
+			runways = append(runways, r)
 		}
-		runways = append(runways, r)
+		airport.Runways = runways
 	}
-	airport.Runways = runways
 	if airport.Runways == nil {
 		airport.Runways = []Runway{}
 	}
 
-	return airport, nil
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(airport)
 }
  
 func handleGetMapstateRequest(w http.ResponseWriter, r *http.Request) {
@@ -1558,17 +1559,7 @@ func managementInterface() {
 		})
 	
 	// stratuxmap routes for retrieving airport data and map state save & restore
-	http.HandleFunc("/airport", func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Query().Get("id")
-		airport, err := handleAirportRequest(id)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if err != nil {
-			json.NewEncoder(w).Encode(Airport{})
-		} else {
-			json.NewEncoder(w).Encode(airport)
-		}
-	})
+	http.HandleFunc("/airport", handleAirportRequest)
 	http.HandleFunc("/savehistory", handleSaveHistoryPost)
 	http.HandleFunc("/getmapstate", handleGetMapstateRequest)
 	http.HandleFunc("/savemapstate", handleSaveMapstatePost)
