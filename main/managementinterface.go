@@ -1324,24 +1324,20 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 
 	var airport Airport
 	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/airports.db", true)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	if err != nil {
-		http.Error(w, "Database open failed", http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(Airport{})
 		return
 	}
-	defer db.Close()
 
 	// Query airport main info
 	row := db.QueryRow(`SELECT ident, name, type, longitude_deg, latitude_deg, elevation_ft FROM airports WHERE ident = ?;`, id)
 	var lon, lat float64
 	var elevation int
 	err = row.Scan(&airport.Ident, &airport.Name, &airport.Type, &lon, &lat, &elevation)
-	if err == sql.ErrNoRows {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
+	if err == sql.ErrNoRows || err != nil {
 		json.NewEncoder(w).Encode(Airport{})
-		return
-	} else if err != nil {
-		http.Error(w, "Airport query failed", http.StatusInternalServerError)
 		return
 	}
 	airport.Lon = lon
@@ -1390,8 +1386,6 @@ func handleAirportRequest(w http.ResponseWriter, r *http.Request) {
 		airport.Runways = []Runway{}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(airport)
 }
  
