@@ -1393,7 +1393,6 @@ func handleAirportRequest(id string) (Airport, error) {
 
 	return airport, nil
 }
-
  
 func handleGetMapstateRequest(w http.ResponseWriter, r *http.Request) {
 	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/mapstate.db", false)
@@ -1468,6 +1467,36 @@ func handleSaveMapstatePost(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"status":"ok"}`))
 }
 
+func handleSaveHistoryPost(w http.ResponseWriter, r *http.Request) {
+	var req map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"invalid json"}`))
+		return
+	}
+	// Extract values from req map
+	longitude, _ := req["longitude"].(float64)
+	latitude, _ := req["latitude"].(float64)
+	heading, _ := req["heading"].(float64)
+	altitude, _ := req["altitude"].(float64)
+	nowZulu := time.Now().UTC().Format("2006-01-02T15:04:05Z")
+
+	db, err := connectMapArchive(STRATUX_WWW_DIR + "data/mapstate.db", false)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error":"db open failed"}`))
+		return
+	}
+	
+	_, err = db.Exec("INSERT INTO position_history (datetime, longitude, latitude, heading, gpsaltitude) VALUES (?, ?, ?, ?, ?)", nowZulu, longitude, latitude, heading, altitude)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error":"db insert failed"}`))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"status":"ok"}`))
+}
 // End of stratuxmap route handlers 
 
 func managementInterface() {
@@ -1540,6 +1569,7 @@ func managementInterface() {
 			json.NewEncoder(w).Encode(airport)
 		}
 	})
+	http.HandleFunc("/savehistory", handleSaveHistoryPost)
 	http.HandleFunc("/getmapstate", handleGetMapstateRequest)
 	http.HandleFunc("/savemapstate", handleSaveMapstatePost)
 	// end of stratuxmap routing
