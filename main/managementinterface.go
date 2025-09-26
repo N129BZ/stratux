@@ -1478,11 +1478,18 @@ func handleNavaidsRequest(w http.ResponseWriter, r *http.Request) {
 
 func handleAirportListRequest(w http.ResponseWriter, r *http.Request) {
 	// Get bounding box parameters
-	airportsOnlyStr := r.URL.Query().Get("airportsonly")
-	airportsOnly := false
-	if airportsOnlyStr != "" {
-		airportsOnly, _ = strconv.ParseBool(airportsOnlyStr)
+	getclosed := r.URL.Query().Get("getclosed")
+	getheliports := r.URL.Query().Get("getheliports")
+
+	includeClosedAirports := false
+	if getclosed != "" {
+		includeClosedAirports, _ = strconv.ParseBool(getclosed)
 	}
+	includeHeliports := false
+	if getheliports != "" {
+		includeHeliports, _ = strconv.ParseBool(getheliports)
+	}
+
 	minLatStr := r.URL.Query().Get("minLat")
 	maxLatStr := r.URL.Query().Get("maxLat")
 	minLonStr := r.URL.Query().Get("minLon")
@@ -1520,12 +1527,17 @@ func handleAirportListRequest(w http.ResponseWriter, r *http.Request) {
 	// Query airports within geographic bounds with full details
 	query := `SELECT ident, name, type, longitude_deg, latitude_deg, elevation_ft FROM airports 
 		WHERE latitude_deg BETWEEN ? AND ? AND longitude_deg BETWEEN ? AND ?`
-	
-	// Add heliport exclusion if airportsOnly is true
-	if airportsOnly {
-		query += ` AND type != 'heliport' AND UPPER(name) NOT LIKE '%HELIPORT%'`
+
+	// Add heliport exclusion if includeHeliports is false
+	if includeHeliports == false {
+		query += ` AND type NOT LIKE '%heliport%' AND UPPER(name) NOT LIKE '%HELIPORT%'`
 	}
 	
+	if includeClosedAirports == false {
+		query += ` AND type NOT LIKE '%closed%' AND UPPER(name) NOT LIKE '%CLOSED%'`
+	}
+	
+	// Limit results to 200 airports to avoid overwhelming the client
 	query += ` ORDER BY name LIMIT 200`
 	
 	rows, err := db.Query(query, minLat, maxLat, minLon, maxLon)
