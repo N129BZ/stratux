@@ -1876,6 +1876,6 @@ func managementInterface() {
 	addr := fmt.Sprintf(":%d", ManagementAddr)
   log.Printf("web configuration console on port %s", addr);
 	if err := http.ListenAndServe(addr, nil); err != nil {
-		log.Printf("managementInterface ListenAndServe\n", err.Error())
+		log.Printf("managementInterface ListenAndServe: %s\n", err.Error())
 	}
 }
